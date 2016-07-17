@@ -10,6 +10,7 @@
 ## Go 언어 인터넷 강좌
 - [가장 빨리 만나는 Go 언어](http://pyrasis.com/private/2015/06/01/publish-go-for-the-really-impatient-book)
 - [Go 프로그래밍 입문](http://codingnuri.com/golang-book/)
+- [Go 언어 투어](https://go-tour-kr.appspot.com/#1)
 - [단숨에 Go 언어 배우기](https://blog.wonhada.com/?p=1930)
 - [바람직한 Go](http://forum.falinux.com/zbxe/index.php?mid=goLang&page=1)
 - [Let’s Go](http://www.slideshare.net/songaal/lets-go-45867246)
