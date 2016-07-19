@@ -28,12 +28,15 @@ intArr[2] = 3
 
 ## 배열 선언 및 초기화
 
-```go
-// 선언과 동시에 각 배열을 초기화 할 수 있다.
-compile_languages := [2]string{"Go", "C"}
+선언과 동시에 각 배열을 초기화 할 수 있다.
+또한 초기화 하는 숫자에 배열 크기를 정의 하도록 할 수 있다.
 
-// 또는 초기화 하는 숫자에 배열 크기를 정의하도록 할 수 있다.
-repl_languages := []string{"Scala", "Kotlin", "Swift"}
+```go
+compile_langs := [2]string{"Go", "C"}
+
+repl_langs := [...]string{"Scala", "Kotlin", "Swift"}
 ```
 
 ---
+
+##
