@@ -14,7 +14,7 @@
 
 ## 배열 선언
 
-```golang
+```go
 // int 형 배열 선언
 var intArr [3]int
 
@@ -28,7 +28,7 @@ intArr[2] = 3
 
 ## 배열 선언 및 초기화
 
-```golang
+```go
 // 선언과 동시에 각 배열을 초기화 할 수 있다.
 compile_languages := [2]string{"Go", "C"}
 
