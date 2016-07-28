@@ -80,6 +80,75 @@ fmt.Println(*ptrArr[0]) // 20
 
 ---
 
+## 배열은 값(Value) 타입
+
+Go 언어는 배열을 값으로 취급한다.
+동일한 크기의 다른 배열에 배열을 서로 대입할 수 있다.
+이 경우 원본 값이 복사된다.
+
+```go
+var status [4]int
+httpStatus := [4]int{200, 300, 400, 500}
+
+status = httpStatus
+// status     : [200 300 400 500]
+// httpStatus : [200 300 400 500]
+
+status[0] = 201
+// status     : [201 300 400 500]
+// httpStatus : [200 300 400 500]
+```
+
+---
+
+## 배열 복사 (1)
+
+배열은 동일한 크기일 경우에만 복사가 가능하다.
+이는 크기와는 무관하다. (크기가 작은 배열을 큰 배열에 대입수 없음)
+
+```go
+var arr1 [3]int
+arr2 := [2]int{200, 300}
+arr1 = arr2 // compile error
+// cannot use arr2 (type [2]int) as type [3]int in assignment
+```
+
+---
+
+## 배열 복사 (2)
+
+배열의 원소가 포인터일 경우, 해당 포인터가 복사된다.
+
+```go
+var pokemons [3]*string
+monsters := [3]*string{new(string), new(string), new(string)}
+*monsters[0], *monsters[1], *monsters[2] = "피카츄", "꼬부기", "잠만보"
+
+pokemons = monsters   // [0xc82000a330 0xc82000a340 0xc82000a350]
+// pokemons, monsters : [피카츄 꼬부기 잠만보]
+
+*monsters[2] = "파이리" // [0xc82000a330 0xc82000a340 0xc82000a350]
+// pokemons, monsters : [피카츄 꼬부기 파이리]
+```
+
+---
+
+## 다차원 배열
+
+배열 리터럴을 사용하면 다차원 배열을 선언할 수 있다.
+
+```go
+matrix := [2][2]int{{1,2}, {3,4}}
+```
+<br />
+다차원 배열 역시 `[ ]`를 사용하여 해당 원소에 접근할 수 있다.
+
+```go
+matrix[0][0] // 1
+matrix[1][1] // 4
+```
+---
+
 ## 슬라이스 (Slice)
 
 - 배열이 가지고 있는 기능은 기본적으로 제공한다.
