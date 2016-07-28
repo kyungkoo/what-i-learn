@@ -6,9 +6,9 @@
 
 ## 배열 (Array)
 
-- 동일한 타입이고
-- 순차적이며
-- 크기가 정해져 있다
+- 원소의 타입이 동일하다.
+- 원소를 순차적으로 저장한다. (순서가 있다)
+- 원소를 저장할 수 있는 크기가 고정되어 있다.
 
 ---
 
@@ -26,10 +26,10 @@ intArr[2] = 3
 
 ---
 
-## 배열 선언 및 초기화
+## 배열 선언 및 초기화 (배열 리터럴)
 
 선언과 동시에 각 배열을 초기화 할 수 있다.
-또한 초기화 하는 숫자에 배열 크기를 정의 하도록 할 수 있다.
+또한 `[ ]` 부분에 `...`을 사용하면 초기화 하는 원소의 개수를 배열의 길이로 정하게 할 수 있다.
 
 ```go
 compile_langs := [2]string{"Go", "C"}
@@ -53,6 +53,33 @@ languages := [3]string{0:"Java", 2:"Python"}
 
 ---
 
+## 배열의 원소에 접근하기
+
+배열 변수에 `[ ]` 연산자를 사용하여 접근하고자 하는 원소의 index 를 지정하면 원하는 원소에 접근이 가능하다.
+
+```go
+arr := [5]int{1, 2, 3, 4, 5}
+fmt.Println(arr[1]) // 2
+```
+
+---
+
+## 배열의 포인터 원소에 접근하기
+
+배열의 원소가 포인터인 경우에는 `*`연산자를 사용하여 접근이 가능하다.
+
+```go
+ptrArr := [2]*int{new(int), new(int)}
+
+*ptrArr[0] = 20
+*ptrArr[1] = 30
+
+fmt.Println(ptrArr[0])  // 0xc82005e028
+fmt.Println(*ptrArr[0]) // 20
+```
+
+---
+
 ## 슬라이스 (Slice)
 
 - 배열이 가지고 있는 기능은 기본적으로 제공한다.
@@ -63,7 +90,7 @@ languages := [3]string{0:"Java", 2:"Python"}
 
 ## 슬라이스 소스 코드
 
-[src/runtime/slice.go](https://golang.org/src/runtime/slice.go)
+*[src/runtime/slice.go](https://golang.org/src/runtime/slice.go)*
 
 ```go
 type slice struct {
