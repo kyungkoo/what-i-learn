@@ -180,3 +180,49 @@ type slice struct {
 ```go
 
 ```
+
+---
+
+## 맵(Map)
+
+키(key) : 값(value) 으로 구성되어 있다.
+맵에 들어있는 데이터는 순서가 없다.
+
+---
+
+## 맵 선언
+
+`make` 함수 또는 리터럴을 사용하여 맵을 선언하고 초기화 할 수 있다.
+
+```go
+httpSuccess := make(map[int]string)
+httpSuccess[200] = "Ok"
+httpSuccess[302] = "Found"
+//map[200:Ok 302:Found]
+
+httpError := map[int]string{404:"NotFound", 502:"Bad Gateway"}
+// map[404:NotFound 502:Bad Gateway]
+```
+
+---
+
+## 맵에서 키의 조건
+
+```go
+
+```
+
+---
+
+## 맵에서 값의 조건
+
+---
+
+## 맵에서 값 가져오기
+
+```go
+value, exists := httpStatus[200]
+
+```
+
+---
