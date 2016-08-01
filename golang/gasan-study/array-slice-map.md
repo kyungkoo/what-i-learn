@@ -93,12 +93,9 @@ var status [4]int
 httpStatus := [4]int{200, 300, 400, 500}
 
 status = httpStatus
-// status     : [200 300 400 500]
-// httpStatus : [200 300 400 500]
-
+// status : [200 300 400 500], httpStatus : [200 300 400 500]
 status[0] = 201
-// status     : [201 300 400 500]
-// httpStatus : [200 300 400 500]
+// status : [201 300 400 500], httpStatus : [200 300 400 500]
 ```
 
 ---
@@ -205,49 +202,7 @@ fmt.Println(cap(slice)) // 20
 
 ---
 
-## 슬라이스의 길이와 용량의 관계
-
-```go
-slice1 := make([]int, 2, 3)
-slice1[0] = 1
-slice1[1] = 2
-fmt.Printf("slice1 : %v, len(%d), cap(%d)\n", slice1, len(slice1), cap(slice1))
-
-slice2 := slice1
-fmt.Printf("slice2 : %v, len(%d), cap(%d)\n", slice2, len(slice2), cap(slice2))
-
-fmt.Println("Change slice2[0] from 1 to 3")
-slice2[0] = 3
-fmt.Printf("slice1 : %v, len(%d), cap(%d)\n", slice1, len(slice1), cap(slice1))
-fmt.Printf("slice2 : %v, len(%d), cap(%d)\n", slice2, len(slice2), cap(slice2))
-
-fmt.Println("append 4, 5, 6 to slice2")
-slice2 = append(slice2, 4, 5, 6)
-fmt.Printf("slice1 : %v, len(%d), cap(%d)\n", slice1, len(slice1), cap(slice1))
-fmt.Printf("slice2 : %v, len(%d), cap(%d)\n", slice2, len(slice2), cap(slice2))
-
-fmt.Println("Change slice2[0] from 3 to 100")
-slice2[0] = 100
-fmt.Printf("slice1 : %v, len(%d), cap(%d)\n", slice1, len(slice1), cap(slice1))
-fmt.Printf("slice2 : %v, len(%d), cap(%d)\n", slice2, len(slice2), cap(slice2))
-/*
-slice1 : [1 2], len(2), cap(3)
-slice2 : [1 2], len(2), cap(3)
-Change slice2[0] from 1 to 3
-slice1 : [3 2], len(2), cap(3)
-slice2 : [3 2], len(2), cap(3)
-append 4, 5, 6 to slice2
-slice1 : [3 2], len(2), cap(3)
-slice2 : [3 2 4 5 6], len(5), cap(6)
-Change slice2[0] from 3 to 100
-slice1 : [3 2], len(2), cap(3)
-slice2 : [100 2 4 5 6], len(5), cap(6)
-*/
-```
-
----
-
-## 슬라이스에 값 추가하기
+## 슬라이스에 값 추가하기 (1)
 
 - `append`함수를 사용하면 슬라이스에 원소를 추가할 수 있다.
 - `append`함수는 슬라이스와 여러 원소를 인자로 받는다.
@@ -257,6 +212,60 @@ slice2 : [100 2 4 5 6], len(5), cap(6)
 slice := []int{}
 slice = append(slice, 20, 30 40)
 // [20 30 40]
+```
+
+---
+
+## 슬라이스에 값 추가하기 (2)
+
+- `append`를 사용하여 슬라이스에 다른 슬라이스를 추가할 수 있다.
+- 이 경우, 추가되는 슬라이스 뒤에 `...`을 입력해야 한다.
+
+```go
+slice1 := []int{1, 2, 3, 4, 5}
+slice2 := []int{100, 200, 300}
+slice1 = append(slice1, slice2...)
+```
+
+---
+
+## `append`와 용량의 관계
+
+- 원본 슬라이스를 다른 슬라이스에 대입할 경우 두 슬라이스는 같은 원소를 공유한다.
+- `appned`를 사용하여 원소를 추가하는 과정에서 용량을 초과할 경우, `append`는 기존 값을 복사한 새로운 슬라이스를 반환한다.
+- 이 경우, 새로운 슬라이스는 원본 슬라이스와 더이상 같은 원소를 공유하지 않게 된다.
+- 따라서 원본 슬라이스에서 기존 값을 변경하더라도 새로운 슬라이스에는 전혀 영향을 주지 못한다.
+
+---
+
+## `append`와 용량의 관계
+
+```go
+slice1 := make([]int, 2, 3)
+slice1[0], slice[1] = 1, 2
+slice2 := slice1
+// slice1=>[1 2], len(2), cap(3), slice2=>[1 2], len(2), cap(3)
+slice2[0] = 3
+// slice1=>[3 2], len(2), cap(3), slice2=>[3 2], len(2), cap(3)
+slice2 = append(slice2, 4, 5, 6)
+// slice1=>[3 2], len(2), cap(3), slice2=>[3 2 4 5 6], len(5), cap(6)
+slice2[0] = 100
+// slice1=>[3 2], len(2), cap(3), slice2=>[100 2 4 5 6], len(5), cap(6)
+```
+
+---
+
+## 슬라이스 복사
+
+- `[start:end]` : start index 부터 end-1 index 까지 슬라이스를 잘라낸다.
+- `[start:end:max]` 위와 동일하게 슬라이스를 잘라내는 대신 `max - start` 만큼의 용량을 설정한다.
+- 단, `max`값은 원본 슬라이스의 용량값을 넘을 수 없다.
+
+```go
+original := []int{1, 2, 3, 4, 5, 6, 7, 8, 9, 10}
+copyone := original[2:4:10]
+// [3 4] len:2, cap:8
+copy2 := original[2:4:11] // PANIC!
 ```
 
 ---
@@ -421,5 +430,3 @@ for key, value := range dict {
   fmt.Printf("%v:%v\n", key, value)
 }
 ```
-
----
