@@ -1,6 +1,9 @@
-# Chapter4
+slidenumbers: true
+autoscale: true
 
-## 배열 - 슬라이스 - 맵
+# Chapter4
+<br />
+##[fit] 배열 - 슬라이스 - 맵
 
 ---
 
@@ -83,8 +86,7 @@ fmt.Println(*ptrArr[0]) // 20
 ## 배열은 값(Value) 타입
 
 Go 언어는 배열을 값으로 취급한다.
-동일한 크기의 다른 배열에 배열을 서로 대입할 수 있다.
-이 경우 원본 값이 복사된다.
+배열을 서로 대입할 경우 원본 값이 복사된다.
 
 ```go
 var status [4]int
@@ -104,7 +106,7 @@ status[0] = 201
 ## 배열 복사 (1)
 
 배열은 동일한 크기일 경우에만 복사가 가능하다.
-이는 크기와는 무관하다. (크기가 작은 배열을 큰 배열에 대입수 없음)
+이는 크기와는 무관하다. (크기가 작은 배열을 큰 배열에 대입 할 수 없음)
 
 ```go
 var arr1 [3]int
@@ -175,10 +177,31 @@ type slice struct {
 
 ## 슬라이스 정의
 
-배열과는 달리 `[]`
+배열과는 달리 `[]`에 슬라이스 원소의 개수를 정의하지 않는다.
 
 ```go
+var slice []int
+slice = make([]int, 10)
+```
+<br />
+리터럴을 사용하면 슬라이스의 정의 와 초기화를 동시에 할 수 있다.
 
+```go
+slice := []int{1, 2, 3, 4}
+```
+
+---
+
+## 슬라이스에 값 추가하기
+
+`append`함수를 사용하면 슬라이스에 원소를 추가할 수 있다.
+`append`함수는 슬라이스와 여러 원소를 인자로 받는다.
+`append`함수는 원소가 추가된 새로운 슬라이스를 반환한다.
+
+```go
+slice := []int{}
+slice = append(slice, 20, 30 40)
+// [20 30 40]
 ```
 
 ---
@@ -206,23 +229,115 @@ httpError := map[int]string{404:"NotFound", 502:"Bad Gateway"}
 
 ---
 
-## 맵에서 키의 조건
+## 맵에서 키와 값의 조건
+
+- `==` 연산자를 이용한 비교가 가능한 타입이면 키로 사용이 가능하다.
+- 슬라이스, 함수, 슬라이스를 가진 함수는 키로 사용이 불가능하다.
+- 값에는 제한이 없다.
+
+---
+
+## 맵에서 값 가져오기 (1)
+
+키를 이용하면 맵에서 값을 가져올 수 있다.
+이 경우 해당 키에 대한 값과 키가 존재하는지에 대한 `Bool` 값을 반환한다.
 
 ```go
-
+value, exists := httpStatus[200]
+if exists {
+  // 해당 키가 존재한다.
+}
 ```
 
 ---
 
-## 맵에서 값의 조건
+## 맵에서 값 가져오기 (2)
+
+반환값을 하나만 지정하면 해당 키에 대한 값을 반환한다.
+해당 키에 대한 값이 없으면 `value` 에 해당하는 타입의 제로값을 반환한다.
+
+```go
+code := httpStatus[200]
+
+if code != "" {
+  // code 의 타입은 문자열이므로
+  // 제로값인 빈 문자열이 반환되었는지를 확인한다.
+}
+```
 
 ---
 
-## 맵에서 값 가져오기
+## nil 맵
+
+맵을 선언만 하고 초기화를 하지 않으면 `nil` 값을 갖게 된다.
+이 경우에는 값을 추가할 수 없다.
+그러나 `nil` 맵에서도 키를 사용하여 값을 가져오는 동작은 가능하다.
 
 ```go
-value, exists := httpStatus[200]
+var myMap map[string]string
+myMap["KANG"] = "Kyungkoo" // PANIC!
+value, exists := myMap["KANG"]
+// value 는 빈 문자열
+// exists 는 false
+```
 
+---
+
+## 배열, 슬라이스, 맵 Loop
+
+배열, 슬라이스, 맵은 `for`와 `range`를 사용하여 같은 방법으로 순회할 수 있다.
+또한 기존의 `for` loop를 이용한 순회도 가능하다.
+
+```go
+arr := [...]int{100, 200, 300}
+
+for index, value := range arr {
+}
+
+for index := 0; index < len(arr); index ++ {
+}
+```
+
+---
+
+## 배열 Loop
+
+배열은 `index`와 `value` 값을 얻는다.
+
+```go
+arr := [...]stirng{"A", "B", "C"}
+
+for index, value := range arr {
+  fmt.Printf("%d:%v\n", index, value)
+}
+```
+
+---
+
+## 슬라이스 Loop
+
+슬라이스는 `index`와 `value` 값을 얻는다.
+
+```go
+slice := []string{"A", "B", "C"}
+
+for index, value := range slice {
+    fmt.Printf("%d:%v\n", index, value)
+}
+```
+
+---
+
+## 맵 Loop
+
+맵은 `key`와 `value` 값을 얻는다.
+
+```go
+dict := map[string]string{"A":"에이", "B":"비", "C":"씨"}
+
+for key, value := range dict {
+  fmt.Printf("%v:%v\n", key, value)
+}
 ```
 
 ---
