@@ -40,7 +40,7 @@ autoscale: true
 
 - `Label`을 사용하면 `for`문에 이름을 부여하여 특정 `for`문으로 이동할 수 있다.
 
-```golang
+```go
 func ExecuteLabel1() {
 FOR_LOOP1: // Label 다음에는 반드시 이름을 붙이고자 하는 for문이 와야 한다.
 	for outer := 0; outer < 10; outer++ {
@@ -61,7 +61,7 @@ FOR_LOOP1: // Label 다음에는 반드시 이름을 붙이고자 하는 for문�
 
 - `goto`문을 사용할 때에도 Label을 사용할 수 있다.
 
-```golang
+```go
 func ExecuteGoto(casenum int) {
 	if casenum == 0 {
 		goto CASE1
@@ -93,7 +93,7 @@ func ExecuteGoto(casenum int) {
 - `n < 1` 인 경우, 현재 설정을 변경하지 않는다. 즉, 0을 입력하면 현제 설정상태를 알 수 있다.
 - **별도로 값을 설정하지 않으면 `CPU` 코어 갯수로 설정된다. (v1.7 현재)**
 
-```golang
+```go
 import "runtime"
 
 runtime.GOMAXPROCS(2) // 프로세스를 2로 설정하고, 이전 상태를 리턴한다.
@@ -110,7 +110,7 @@ runtime.GOMAXPROCS(0)
 - 따라서 고루틴이 끝날때 까지 기다릴 수 있는 기능이 필요.
 - `sync.WaitGroup`을 사용하여 특정 갯수만큼 지정하여 그 갯수만큼 기다릴 수 있음.
 
-```golang
+```go
 import "sync"
 
 var wg sync.WaitGroup
