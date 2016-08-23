@@ -83,6 +83,17 @@ func ExecuteGoto(casenum int) {
 
 - 경량화 된 스레드. (`2kb`, 일반적인 스레드는 보통 최고 `2mb`)
 - `func main()` 함수는 `main goroutine`에서 실행된다.
+- 실행하고자 하는 함수 앞에 `go` 를 추가하면 `goroutine` 으로 실행된다.
+
+```go
+
+func executeFunc() {
+	// do something
+}
+
+go executeFunc() // goroutine 으로 함수 실행
+
+```
 
 ---
 
