@@ -130,3 +130,114 @@ func (r *Runner) gotInterrupt() bool {
 	}
 }
 ```
+
+---
+
+## `createTask` Function
+
+```go
+func createTask() func(int) {
+	return func(id int) {
+		log.Printf("프로세서작업 #%d.", id)
+		time.Sleep(time.Duration(id) * time.Second)
+	}
+}
+```
+
+---
+
+## `main` Function
+
+```go
+const timeout = 3 * time.Second
+
+r := runner.New(timeout)
+
+r.Add(createTask(), createTask(), createTask())
+```
+
+---
+
+## `main` Function
+
+```go
+if err := r.Start(); err != nil {
+	switch err {
+	case runner.ErrTimeout:
+		log.Println("지정된 작업 시간을 초과했습니다.")
+		os.Exit(1)
+	case runner.ErrInterrupt:
+		log.Println("운영체제 인터럽트가 발생했습니다.")
+		os.Exit(2)
+	}
+}
+```
+---
+
+## One More
+
+---
+
+## `error` 를 `const` 로 정의할 수는 없을까?
+
+```go
+const ErrTimeout = errors.New("시간을 초과했습니다.")
+const ErrInterrupt = errors.New("운영체제 인터럽트 신호를 수신했습니다.")
+
+```
+
+<br />
+
+- `const` 로 선언하면 **에러 발생**
+
+```sh
+const initializer errors.New("시간을 초과했습니다.") is not a constant
+const initializer errors.New("운영체제 인터럽트 신호를 수신했습니다.") is not a constant
+```
+
+---
+
+## Tips
+
+1. `const` 에는 `const` 만 저장 할 수 있다.
+1. `string` 은 `const` 타입이다.
+1. `error` 는 `interface` 타입이다.
+
+<br />
+
+- **reference**
+**[constant-errors](http://dave.cheney.net/2016/04/07/constant-errors)** (dave.cheney)
+
+---
+
+## Custom `err` package
+
+```go
+// Errors 타입 정의
+type Errors string
+
+// error interface 를 채용하기 위해 함수 선언
+func (err Errors) Error() string {
+	return string(err)
+}
+```
+
+---
+
+## Use `err.Errors`
+
+```go
+const (
+	ErrTimeout = err.Errors("시간을 초과했습니다.")
+	ErrInterrupt = err.Errors("운영체제 인터럽트 신호를 수신했습니다.")
+)
+
+switch err {
+case runner.ErrTimeout:
+	// do
+case runner.ErrInterrupt:
+	// do
+}
+```
+
+---
