@@ -9,11 +9,11 @@ slidenumbers: true
 
 ## Case Studies
 
-1. `Runner`
+1. **`Runner`**
 
-1. `Pool`
+1. **`Pool`**
 
-1. `Work`
+1. ~~`Work`~~
 
 ---
 
@@ -28,14 +28,16 @@ slidenumbers: true
 type Runner struct {
 	// 운영체제로부터 전달되는 인터럽트 신호를 수신하는 채널
 	interrupt chan os.Signal
-	// 처리가 종료되었음을 알리는 채널
-	complete  chan error
+	// 처리가 종료되었음을 알리는 채널   
+	complete  chan error	  
 	// 지정된 시간이 초과되었음을 알리는 채널
 	timeout   <-chan time.Time
 	// 인덱스 순서로 처리될 작업 목록을 저장하는 슬라이스
-	tasks     []func(int)
+	tasks     []func(int) 	
 }
 ```
+
+- `time` package 의 _[`After`](https://golang.org/pkg/time/#After)_ 함수는 `<-chan Time` 를 반환한다.
 
 ---
 
@@ -94,6 +96,15 @@ func (r *Runner) Start() error {
 	}
 }
 ```
+
+---
+
+## `select`
+
+- `Channel` 을 위한 `switch` 문.
+- `case` 에 정의한 채널을 **한 번** 만 받는다.
+- `case` 에 정의한 채널 값이 올 때 까지 블로킹 된다.
+- `default` 를 선언하면 해당 채널이 오지 않았을 때 처리가 이루어 진다.
 
 ---
 
@@ -174,7 +185,7 @@ if err := r.Start(); err != nil {
 ```
 ---
 
-## One More
+## One More Thing
 
 ---
 
@@ -242,18 +253,37 @@ case runner.ErrInterrupt:
 
 ---
 
-## `Pool` Example
+## `Pool`
+
+---
+
+## Define `Pool` sturct
 
 ```go
+// Pool 구조체는 여러 개의 고루틴에서 안전하게 공유하기 위한 리소스 집합을 관리
 type Pool struct {
 	m         sync.Mutex
 	resources chan io.Closer
 	factory   func() (io.Closer, error)
 	closed    bool
 }
+```
 
+- _[`io.Closer`](https://golang.org/pkg/io/#Closer)_ 는 `Close()`를 갖는 인터페이스다.
+
+---
+
+## Define Errors
+
+```go
 var ErrPoolClosed = errors.New("풀이 닫혔습니다.")
+```
 
+---
+
+## Define
+
+```go
 func New(fn func() (io.Closer, error), size uint) (*Pool, error) {
 	if size <= 0 {
 		return nil, errors.New("풀의 크기가 너무 작습니다.")
@@ -264,7 +294,13 @@ func New(fn func() (io.Closer, error), size uint) (*Pool, error) {
 		resources: make(chan io.Closer, size),
 	}, nil
 }
+```
 
+---
+
+## Define `Acquire` Method
+
+```go
 func (p *Pool) Acquire() (io.Closer, error) {
 	select {
 	case r, ok := <-p.resources:
@@ -279,28 +315,45 @@ func (p *Pool) Acquire() (io.Closer, error) {
 		return p.factory()
 	}
 }
+```
 
+---
+
+## Define `Release` Method
+
+```go
 func (p *Pool) Release(r io.Closer) {
-	// 안전한 작업을 위해 잠금을 설정한다.
-	p.m.Lock()
+	p.m.Lock() // 안전한 작업을 위해 잠금을 설정한다.
 	defer p.m.Unlock()
 
-	// 풀이 닫혔으면 리소스를 해제한다.
 	if p.closed {
-		r.Close()
+		r.Close() // 풀이 닫혔으면 리소스를 해제한다.
 		return
 	}
-
-	select {
-	case p.resources <- r:
-		log.Println("리소스 반환:", "리소스 큐에 반환")
-
-	default:
-		log.Println("리소스 반환:", "리소스 해제")
-		r.Close()
-	}
+	// select 문
 }
+```
 
+---
+
+## Define `select` in `Release` Method
+
+```go
+select {
+case p.resources <- r:
+	log.Println("리소스 반환:", "리소스 큐에 반환")
+
+default:
+	log.Println("리소스 반환:", "리소스 해제")
+	r.Close()
+}
+```
+
+---
+
+## Define `Close` Method
+
+```go
 func (p *Pool) Close() {
 	p.m.Lock()
 	defer p.m.Unlock()
@@ -310,11 +363,108 @@ func (p *Pool) Close() {
 	}
 
 	p.closed = true
-
 	close(p.resources)
 
 	for r := range p.resources {
 		r.Close()
 	}
 }
+```
+
+---
+
+## `Pool` Example
+
+
+```go
+// Define constant
+const (
+	maxGoroutines  = 25
+	pooledResorces = 2
+)
+```
+
+---
+
+## Define `dbConnection` struct
+
+```go
+type dbConnection struct {
+	ID int32
+}
+
+// io.Closer 인터페이스를 구현하기 위해 `Close()` 메소드 구현
+func (dbConn *dbConnection) Close() error {
+	log.Println("닫힘: 데이터베이스 연결,", dbConn.ID)
+	return nil
+}
+```
+
+---
+
+## Define `createConnection` Function
+
+```go
+var idCounter int32
+
+func createConnection() (io.Closer, error) {
+	id := atomic.AddInt32(&idCounter, 1)
+	log.Println("생성: 새 데이터베이스 연결", id)
+
+	return &dbConnection{id}, nil
+}
+```
+
+---
+
+## Define `performQueries` Function
+
+```go
+func performQueries(query int, p *pool.Pool) {
+	conn, err := p.Acquire()
+	if err != nil {
+		log.Println(err)
+		return
+	}
+
+	defer p.Release(conn)
+
+	time.Sleep(time.Duration(rand.Intn(1000)) * time.Millisecond)
+	// conn.(*dbConnection) 으로 interface 타입을 dbConnection 참조 타입으로 타입 변환.
+	log.Printf("질의: QID[%d] CID[%d]\n", query, conn.(*dbConnection).ID)
+}
+```
+
+---
+
+## Define `main` Function (1)
+
+```go
+var wg sync.WaitGroup
+// 고루틴 갯수를 추가
+wg.Add(maxGoroutines)
+
+p, err := pool.New(createConnection, pooledResorces)
+if err != nil {
+	log.Println(err)
+}
+```
+
+---
+
+## Define `main` Function (2)
+
+```go
+for query := 0; query < maxGoroutines; query++ {
+
+	go func(q int) {
+		performQueries(q, p) // 고루틴마다 함수 실행
+		wg.Done()
+	}(query)
+}
+
+wg.Wait() // 고루틴 대기
+
+log.Println("프로그램을 종료합니다.")
+p.Close()
 ```
